@@ -6,9 +6,9 @@ const { supa, checkAuth, json, readBody } = require('./_lib');
 
 module.exports = async (req, res) => {
   if (!checkAuth(req)) return json(res, 401, { ok: false, error: 'unauthorized' });
-  const db = supa();
 
   try {
+    const db = supa();
     if (req.method === 'GET') {
       const { data, error } = await db.from('clients').select('*').order('created_at', { ascending: true });
       if (error) throw error;
