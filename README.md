@@ -53,7 +53,7 @@ Now it's an icon. It syncs to the cloud, so you can open it on your laptop too w
 
 ---
 
-## Changing your passcode later
+## Changing your passcode later 
 
 Vercel dashboard → your project → **Settings → Environment Variables** → edit `APP_PASSCODE` →
 then **Deployments → ⋯ → Redeploy** so the change takes effect. (Anyone already logged in on a
