@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#25201a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Bone Cadets · HQ</title>
+<style>
+:root{
+  --bg:#211c17; --bg2:#2a241d; --panel:#302a22; --panel2:#38312a;
+  --cream:#f5ecdb; --sand:#d8c7a8; --muted:#a2957f;
+  --moss:#7ba05b; --moss-deep:#5c7d43; --gold:#e0a63c; --gold-soft:#f0c874;
+  --clay:#d3663f; --ink:#1a1611; --line:#463d33; --good:#8fce77; --danger:#d3663f;
+  --shadow:0 8px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:inherit}
+html,body{background:var(--bg);color:var(--cream);
+  font-family:"Avenir Next","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{max-width:540px;margin:0 auto;min-height:100dvh;padding-bottom:96px;position:relative;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(1200px 400px at 50% -120px,rgba(224,166,60,.10),transparent 70%);}
+.serif{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}
+
+/* ---------- LOGIN ---------- */
+#gate{position:fixed;inset:0;z-index:50;background:linear-gradient(180deg,#241f19,#191510);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
+#gate .crest{width:96px;height:96px;border-radius:26px;background:
+   radial-gradient(circle at 50% 35%,var(--gold-soft),var(--gold) 55%,var(--moss-deep) 56%,var(--moss) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:46px;box-shadow:var(--shadow);
+  border:3px solid rgba(245,236,219,.15);margin-bottom:22px;animation:pop .5s ease}
+@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+#gate h1{font-size:26px;letter-spacing:.5px;margin-bottom:6px}
+#gate p{color:var(--muted);font-size:14px;margin-bottom:26px}
+#gate .pin{display:flex;gap:10px;margin-bottom:18px}
+#gate input{width:100%;max-width:280px;padding:15px 18px;border-radius:14px;border:1px solid var(--line);
+  background:var(--panel);color:var(--cream);font-size:17px;text-align:center;letter-spacing:3px;outline:none}
+#gate input:focus{border-color:var(--gold)}
+#gate button{width:100%;max-width:280px;padding:15px;border-radius:14px;border:0;cursor:pointer;
+  background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:var(--ink);font-size:16px;font-weight:700;margin-top:4px}
+#gate .err{color:var(--clay);font-size:13px;height:18px;margin-top:12px}
+
+/* ---------- HEADER ---------- */
+header{position:relative;z-index:1;padding:calc(env(safe-area-inset-top) + 18px) 20px 16px}
+.hrow{display:flex;align-items:center;gap:13px}
+.hrow .crest{width:46px;height:46px;border-radius:14px;background:
+   radial-gradient(circle at 50% 35%,var(--gold-soft),var(--gold) 55%,var(--moss-deep) 56%,var(--moss) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:23px;flex-shrink:0;box-shadow:var(--shadow)}
+.hrow h1{font-size:21px;letter-spacing:.4px;line-height:1}
+.hrow .tag{font-size:12px;color:var(--gold-soft);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
+.cloud{margin-left:auto;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;
+  background:var(--panel);border:1px solid var(--line);padding:6px 10px;border-radius:20px}
+.cloud .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);transition:.3s}
+.cloud.ok .dot{background:var(--good)}.cloud.off .dot{background:var(--clay)}
+.cloud.syncing .dot{background:var(--gold);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+
+/* date pill */
+.datepill{position:relative;z-index:1;margin:14px 20px 0;display:flex;align-items:center;gap:10px}
+.datepill .nav{width:42px;height:46px;border-radius:13px;border:1px solid var(--line);background:var(--panel);
+  color:var(--cream);font-size:20px;cursor:pointer;flex-shrink:0}
+.datepill .nav:active{background:var(--panel2)}
+.datepill .center{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:13px;
+  padding:9px 14px;text-align:center;cursor:pointer;position:relative;overflow:hidden}
+.datepill .center:active{background:var(--panel2)}
+.datepill .center .d{font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+.datepill .center .d .cal{font-size:15px;opacity:.7}
+.datepill .center .sub{font-size:11px;color:var(--gold-soft);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+
+/* mode chips */
+.modechips{display:flex;gap:8px;margin:12px 20px 0;position:relative;z-index:1}
+.modechips button{flex:1;padding:9px;border-radius:11px;border:1px solid var(--line);background:transparent;
+  color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+.modechips button.on{background:var(--moss-deep);border-color:var(--moss);color:#fff}
+
+/* ---------- CALENDAR SHEET ---------- */
+.cal-backdrop{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.55);display:none;
+  align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
+.cal-backdrop.show{display:flex}
+.cal-sheet{width:100%;max-width:540px;background:var(--bg2);border-radius:24px 24px 0 0;padding:18px 18px calc(env(safe-area-inset-bottom) + 22px);
+  border-top:1px solid var(--line);box-shadow:0 -10px 40px rgba(0,0,0,.5);animation:slideup .25s ease}
+@keyframes slideup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.cal-sheet .grab{width:40px;height:4px;background:var(--line);border-radius:3px;margin:0 auto 16px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-head .mlabel{font-size:17px;font-weight:700}
+.cal-head button{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--panel);color:var(--cream);font-size:18px;cursor:pointer}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal-grid .dow{text-align:center;font-size:11px;color:var(--muted);padding:4px 0;font-weight:600}
+.cal-grid .cell{aspect-ratio:1;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:15px;cursor:pointer;border:1px solid transparent;position:relative}
+.cal-grid .cell.other{color:var(--line)}
+.cal-grid .cell.today{border-color:var(--gold)}
+.cal-grid .cell.sel{background:var(--moss-deep);color:#fff;font-weight:700}
+.cal-grid .cell.has::after{content:"";position:absolute;bottom:6px;width:5px;height:5px;border-radius:50%;background:var(--gold)}
+.cal-grid .cell.sel.has::after{background:#fff}
+.cal-quick{display:flex;gap:8px;margin-top:16px}
+.cal-quick button{flex:1;padding:11px;border-radius:11px;border:1px solid var(--line);background:var(--panel);color:var(--cream);font-size:13px;cursor:pointer}
+
+/* ---------- TABS ---------- */
+.tabs{display:flex;gap:6px;margin:16px 16px 0;position:relative;z-index:1;background:var(--panel);padding:5px;border-radius:14px;border:1px solid var(--line)}
+.tabs button{flex:1;padding:10px;border-radius:10px;border:0;background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+.tabs button.on{background:var(--bg2);color:var(--cream);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.view{display:none;position:relative;z-index:1}.view.on{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* section */
+.sec{padding:18px 16px 0}
+.sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;padding:0 4px}
+.sec-h h2{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-soft)}
+.sec-h .links{display:flex;gap:14px}
+.sec-h .lnk{font-size:13px;color:var(--moss);cursor:pointer;font-weight:600}
+
+/* cadet card */
+.cadet{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 13px;margin-bottom:9px;
+  display:flex;align-items:center;gap:12px;transition:.15s}
+.cadet.paid{border-color:var(--moss);background:linear-gradient(90deg,rgba(123,160,91,.10),rgba(123,160,91,.03))}
+.badge{width:44px;height:44px;border-radius:13px;background:var(--bg2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;transition:.15s}
+.cadet.paid .badge{background:var(--moss-deep);border-color:var(--moss);transform:rotate(-4deg)}
+.cadet .nm{flex:1;font-size:16px;font-weight:600;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.amt{display:flex;align-items:center;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:6px 12px;width:112px}
+.amt.filled{border-color:var(--moss);background:#2f3527}
+.amt span{color:var(--muted);font-size:16px}
+.amt input{border:0;background:transparent;color:var(--cream);font-size:18px;font-weight:700;width:100%;text-align:right;outline:none;font-family:inherit}
+.x{color:var(--muted);font-size:20px;padding:2px 4px;cursor:pointer;flex-shrink:0}
+.empty{text-align:center;color:var(--muted);font-size:14px;padding:22px;font-style:italic;line-height:1.5}
+
+.addbar{display:flex;gap:8px;margin-bottom:10px}
+.addbar input{flex:1;padding:13px;border-radius:13px;border:1px dashed var(--line);background:var(--panel);color:var(--cream);font-size:15px;outline:none}
+.addbar input:focus{border-color:var(--moss);border-style:solid}
+.addbar button{padding:0 20px;border-radius:13px;border:0;background:var(--moss);color:#fff;font-weight:700;cursor:pointer}
+
+.li{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:11px}
+.li .ic{font-size:18px}.li .tx{flex:1;font-size:15px}.li .tx small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
+.li .vl{font-weight:700}
+.mini{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:8px;display:none}
+.mini.show{display:block}
+.mini .r{display:flex;gap:8px;margin-bottom:8px}
+.mini input{flex:1;padding:12px;border-radius:11px;border:1px solid var(--line);background:var(--bg2);color:var(--cream);font-size:15px;outline:none;min-width:0}
+.mini input:focus{border-color:var(--moss)}
+.mini .b{display:flex;gap:8px}
+.mini .b button{flex:1;padding:12px;border-radius:11px;border:0;font-weight:600;cursor:pointer}
+.mini .go{background:var(--moss);color:#fff}.mini .no{background:var(--bg2);color:var(--muted);border:1px solid var(--line)}
+.note{background:rgba(224,166,60,.10);border:1px solid rgba(224,166,60,.35);border-radius:12px;padding:11px 13px;margin:0 4px 12px;font-size:12.5px;color:var(--gold-soft);line-height:1.45}
+
+/* ---------- FOOTER TOTALS ---------- */
+.foot{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:540px;z-index:20;
+  background:linear-gradient(180deg,var(--panel2),var(--bg2));border-top:1px solid var(--line);
+  padding:12px 16px calc(env(safe-area-inset-bottom) + 14px);display:flex;gap:10px;box-shadow:0 -8px 24px rgba(0,0,0,.4)}
+.fbox{flex:1;text-align:center}
+.fbox .l{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.fbox .v{font-size:21px;font-weight:800;margin-top:3px;font-family:"Iowan Old Style",Georgia,serif}
+.fbox.in .v{color:var(--gold-soft)}.fbox.tax .v{color:var(--clay)}.fbox.keep .v{color:var(--good)}
+.fbox+.fbox{border-left:1px solid var(--line)}
+
+/* ---------- SUMMARY ---------- */
+.per{display:flex;gap:6px;padding:16px 16px 0}
+.per button{flex:1;padding:10px;border-radius:11px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer}
+.per button.on{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.hero{margin:14px 16px;border-radius:20px;padding:20px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#3a2f1e,#2c2519);border:1px solid var(--gold);box-shadow:var(--shadow)}
+.hero::after{content:"🐾";position:absolute;right:-10px;bottom:-18px;font-size:90px;opacity:.06}
+.hero .hl{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-soft)}
+.hero .hb{font-size:38px;font-weight:800;margin:4px 0;font-family:"Iowan Old Style",Georgia,serif}
+.hero .hs{font-size:13px;color:var(--sand);line-height:1.5}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px}
+.card.w{grid-column:1/3}
+.card .k{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.card .v{font-size:25px;font-weight:800;margin-top:5px;font-family:"Iowan Old Style",Georgia,serif;color:var(--cream)}
+.card.clay .v{color:var(--clay)}.card.moss .v{color:var(--good)}
+.card .n{font-size:12px;color:var(--muted);margin-top:3px}
+.loglist{padding:6px 16px 16px}
+.logrow{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.logrow .ld{font-size:14px;font-weight:600}.logrow .lc{font-size:12px;color:var(--muted)}
+.logrow .la{font-size:17px;font-weight:800;color:var(--gold-soft);font-family:"Iowan Old Style",Georgia,serif}
+
+/* ---------- SETTINGS ---------- */
+.srow{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px;margin:0 16px 10px}
+.srow label{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-soft);display:block;margin-bottom:10px}
+.srow .sl{display:flex;align-items:center;gap:12px}
+.srow input[type=range]{flex:1;accent-color:var(--gold)}
+.srow .pc{font-size:22px;font-weight:800;color:var(--gold-soft);width:74px;text-align:right;font-family:Georgia,serif}
+.srow p{font-size:12px;color:var(--muted);margin-top:9px;line-height:1.5}
+.bfull{width:calc(100% - 32px);margin:8px 16px;padding:14px;border-radius:13px;font-size:14px;font-weight:600;cursor:pointer;border:0}
+.bmoss{background:var(--moss-deep);color:#fff}.bghost{background:transparent;color:var(--gold-soft);border:1px solid var(--line)}
+.bdang{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(20px);z-index:60;
+  background:var(--ink);color:var(--cream);padding:12px 20px;border-radius:14px;font-size:14px;font-weight:600;
+  border:1px solid var(--line);box-shadow:var(--shadow);opacity:0;transition:.25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(245,236,219,.3);border-top-color:var(--cream);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN GATE -->
+<div id="gate">
+  <div class="crest">🐾</div>
+  <h1 class="serif">Bone Cadets HQ</h1>
+  <p>Enter your passcode to report for duty</p>
+  <input id="pin" type="password" inputmode="numeric" placeholder="• • • •" autocomplete="off">
+  <button id="pinBtn">Enter</button>
+  <div class="err" id="pinErr"></div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="hrow">
+    <div class="crest">🐾</div>
+    <div>
+      <h1 class="serif">Bone Cadets</h1>
+      <div class="tag">Muster &amp; Pay Log</div>
+    </div>
+    <div class="cloud" id="cloud"><span class="dot"></span><span class="ctxt">Cloud</span></div>
+  </div>
+  <div class="modechips" id="modechips">
+    <button class="on" data-mode="day">Day</button>
+    <button data-mode="week">Week · backlog</button>
+  </div>
+  <div class="datepill">
+    <button class="nav" id="prev">‹</button>
+    <div class="center" id="dateOpen">
+      <div class="d"><span class="cal">📅</span><span id="dLabel">Today</span></div>
+      <div class="sub" id="dSub">tap to pick</div>
+    </div>
+    <button class="nav" id="next">›</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="on" data-tab="log">Log</button>
+  <button data-tab="summary">Summary</button>
+  <button data-tab="settings">Settings</button>
+</div>
+
+<!-- LOG -->
+<div class="view on" id="v-log">
+  <div class="sec">
+    <div id="noteWrap"></div>
+    <div class="sec-h"><h2 id="rollLbl">Roll Call</h2>
+      <div class="links"><span class="lnk" id="tglBlanks">Show all</span><span class="lnk" id="addC">+ Cadet</span></div>
+    </div>
+    <div class="addbar" id="addBar" style="display:none">
+      <input id="newC" placeholder="Dog name" autocomplete="off"><button id="saveC">Add</button>
+    </div>
+    <div id="cadets"></div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Expenses</h2><div class="links"><span class="lnk" id="addE">+ Add</span></div></div>
+    <div class="mini" id="eForm">
+      <div class="r"><input id="eDesc" placeholder="What for? (treats, bags…)"><input id="eAmt" placeholder="$" inputmode="decimal" style="max-width:92px"></div>
+      <div class="b"><button class="no" id="eNo">Cancel</button><button class="go" id="eGo">Add</button></div>
+    </div>
+    <div id="eList"></div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Mileage</h2><div class="links"><span class="lnk" id="addM">+ Add</span></div></div>
+    <div class="mini" id="mForm">
+      <div class="r"><input id="mDesc" placeholder="Route (optional)"><input id="mAmt" placeholder="miles" inputmode="decimal" style="max-width:92px"></div>
+      <div class="b"><button class="no" id="mNo">Cancel</button><button class="go" id="mGo">Add</button></div>
+    </div>
+    <div id="mList"></div>
+  </div>
+</div>
+
+<!-- SUMMARY -->
+<div class="view" id="v-summary">
+  <div class="per">
+    <button class="on" data-p="month">Month</button>
+    <button data-p="quarter">Quarter</button>
+    <button data-p="year">Year</button>
+  </div>
+  <div class="hero">
+    <div class="hl">Set aside for taxes</div>
+    <div class="hb" id="sTax">$0</div>
+    <div class="hs" id="sTaxSub">Bank this and quarterly payments won't sting.</div>
+  </div>
+  <div class="grid">
+    <div class="card"><div class="k">Income</div><div class="v" id="sIn">$0</div></div>
+    <div class="card clay"><div class="k">Expenses</div><div class="v" id="sEx">$0</div></div>
+    <div class="card"><div class="k">Miles</div><div class="v" id="sMi">0</div><div class="n" id="sMiD">$0 deduction</div></div>
+    <div class="card"><div class="k">Net profit</div><div class="v" id="sNet">$0</div></div>
+    <div class="card w moss"><div class="k">Take-home after tax set-aside</div><div class="v" id="sKeep">$0</div></div>
+  </div>
+  <div class="sec-h" style="padding:16px 20px 0"><h2>Recent</h2></div>
+  <div class="loglist" id="logList"></div>
+</div>
+
+<!-- SETTINGS -->
+<div class="view" id="v-settings">
+  <div style="height:14px"></div>
+  <div class="srow">
+    <label>Tax set-aside rate</label>
+    <div class="sl"><input type="range" id="taxR" min="15" max="40" step="1" value="30"><div class="pc" id="taxRP">30%</div></div>
+    <p>Federal SE + income tax + CA state runs ~28–30% of net profit. 30% is a safe default.</p>
+  </div>
+  <div class="srow">
+    <label>Mileage rate ($/mile)</label>
+    <div class="sl"><input type="range" id="mileR" min="0.50" max="0.80" step="0.005" value="0.70"><div class="pc" id="mileRP">$0.70</div></div>
+    <p>IRS standard rate. Covers gas + repairs + depreciation — can't also deduct those separately.</p>
+  </div>
+  <button class="bfull bghost" id="exp">Export CSV backup</button>
+  <button class="bfull bghost" id="reload">Reload from cloud</button>
+  <button class="bfull bdang" id="logout">Log out</button>
+  <div style="height:20px"></div>
+</div>
+
+<div class="foot" id="foot">
+  <div class="fbox in"><div class="l" id="fLbl">Today In</div><div class="v" id="fIn">$0</div></div>
+  <div class="fbox tax"><div class="l">Set Aside</div><div class="v" id="fTax">$0</div></div>
+  <div class="fbox keep"><div class="l">Keep</div><div class="v" id="fKeep">$0</div></div>
+</div>
+
+<!-- CALENDAR -->
+<div class="cal-backdrop" id="calBack">
+  <div class="cal-sheet" id="calSheet">
+    <div class="grab"></div>
+    <div class="cal-head">
+      <button id="calPrev">‹</button>
+      <div class="mlabel" id="calMonth">Month</div>
+      <button id="calNext">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-quick">
+      <button id="calToday">Today</button>
+      <button id="calClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ STATE ============ */
+const LS_PIN='bc_pin', LS_SET='bc_settings', LS_CACHE='bc_cache';
+let pin=localStorage.getItem(LS_PIN)||'';
+let settings=loadSettings();
+let clients=[];            // [{id,name}]
+let entries=[];            // [{id,kind,date,client_id,label,amount,miles}]
+let curDate=new Date();
+let mode='day';
+let showAll=false;
+let curPeriod='month';
+let calView=new Date();
+
+function loadSettings(){try{return Object.assign({taxRate:30,mileRate:0.70},JSON.parse(localStorage.getItem(LS_SET)||'{}'))}catch(e){return{taxRate:30,mileRate:0.70}}}
+function saveSettings(){localStorage.setItem(LS_SET,JSON.stringify(settings))}
+function cacheSave(){localStorage.setItem(LS_CACHE,JSON.stringify({clients,entries}))}
+function cacheLoad(){try{const c=JSON.parse(localStorage.getItem(LS_CACHE)||'{}');clients=c.clients||[];entries=c.entries||[]}catch(e){}}
+
+/* ============ API ============ */
+async function api(path,method='GET',body){
+  const opt={method,headers:{'x-passcode':pin}};
+  if(body){opt.headers['Content-Type']='application/json';opt.body=JSON.stringify(body)}
+  const r=await fetch('/api/'+path,opt);
+  if(r.status===401){throw {auth:true}}
+  return r.json();
+}
+function setCloud(state){const c=document.getElementById('cloud');c.className='cloud '+(state||'');
+  c.querySelector('.ctxt').textContent=state==='ok'?'Synced':state==='off'?'Offline':state==='syncing'?'Syncing':'Cloud';}
+
+/* ============ LOGIN ============ */
+const gate=document.getElementById('gate');
+async function tryLogin(code){
+  document.getElementById('pinErr').textContent='';
+  try{
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({passcode:code})});
+    const j=await r.json();
+    if(j.ok){pin=code;localStorage.setItem(LS_PIN,code);gate.style.display='none';boot();}
+    else{document.getElementById('pinErr').textContent='Wrong passcode';}
+  }catch(e){document.getElementById('pinErr').textContent='Connection problem';}
+}
+document.getElementById('pinBtn').onclick=()=>tryLogin(document.getElementById('pin').value.trim());
+document.getElementById('pin').addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin(e.target.value.trim())});
+
+/* ============ BOOT ============ */
+async function boot(){
+  cacheLoad(); renderAll();          // instant paint from cache
+  setCloud('syncing');
+  try{
+    const [c,e]=await Promise.all([api('clients'),api('entries')]);
+    if(c.ok)clients=c.clients.map(x=>({id:x.id,name:x.name}));
+    if(e.ok)entries=e.entries;
+    cacheSave(); renderAll(); setCloud('ok');
+  }catch(err){ setCloud(err.auth?'off':'off'); if(err.auth){localStorage.removeItem(LS_PIN);gate.style.display='flex';} }
+}
+
+/* ============ HELPERS ============ */
+function pad(n){return String(n).padStart(2,'0')}
+function dkey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function money(n){return '$'+Math.round(n).toLocaleString()}
+function money2(n){return '$'+Number(n).toFixed(2)}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function uuid(){return (crypto.randomUUID?crypto.randomUUID():'x'+Date.now()+Math.random().toString(16).slice(2))}
+function weekStart(d){const x=new Date(d);const wd=(x.getDay()+6)%7;x.setDate(x.getDate()-wd);x.setHours(0,0,0,0);return x}
+function activeDate(){return mode==='week'?dkey(weekStart(curDate)):dkey(curDate)}
+function toast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1900)}
+
+/* income entry lookup: one income row per (client,date) */
+function incomeFor(cid,date){return entries.find(e=>e.kind==='income'&&e.client_id===cid&&e.date===date)}
+function dayEntries(date,kind){return entries.filter(e=>e.date===date&&e.kind===kind)}
+
+/* ============ PERSIST ONE ENTRY ============ */
+async function putEntry(entry){
+  // optimistic local
+  const i=entries.findIndex(e=>e.id===entry.id);
+  if(i>=0)entries[i]=entry;else entries.push(entry);
+  cacheSave();
+  setCloud('syncing');
+  try{await api('entries','POST',{entry});setCloud('ok')}catch(e){setCloud('off')}
+}
+async function delEntry(id){
+  entries=entries.filter(e=>e.id!==id);cacheSave();setCloud('syncing');
+  try{await api('entries','DELETE',{id});setCloud('ok')}catch(e){setCloud('off')}
+}
+
+/* ============ DATE / MODE ============ */
+document.querySelectorAll('#modechips button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#modechips button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');mode=b.dataset.mode;renderAll();
+});
+document.getElementById('prev').onclick=()=>{curDate.setDate(curDate.getDate()-(mode==='week'?7:1));renderAll()};
+document.getElementById('next').onclick=()=>{curDate.setDate(curDate.getDate()+(mode==='week'?7:1));renderAll()};
+function renderDate(){
+  if(mode==='week'){
+    const ws=weekStart(curDate),we=new Date(ws);we.setDate(we.getDate()+6);
+    const f={month:'short',day:'numeric'};
+    document.getElementById('dLabel').textContent=ws.toLocaleDateString('en-US',f)+' – '+we.toLocaleDateString('en-US',f);
+    document.getElementById('dSub').textContent=dkey(weekStart(new Date()))===dkey(ws)?'this week':'tap to pick';
+    document.getElementById('rollLbl').textContent='Weekly total / cadet';
+    document.getElementById('fLbl').textContent='Week In';
+    document.getElementById('noteWrap').innerHTML='<div class="note">Backlog mode — enter each cadet\u2019s <b>weekly total</b>, filed to the Monday of this week. Fast way to catch up.</div>';
+  }else{
+    document.getElementById('dLabel').textContent=curDate.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    document.getElementById('dSub').textContent=dkey(curDate)===dkey(new Date())?'today':'tap to pick';
+    document.getElementById('rollLbl').textContent='Roll Call';
+    document.getElementById('fLbl').textContent='Today In';
+    document.getElementById('noteWrap').innerHTML='';
+  }
+}
+
+/* ============ CALENDAR ============ */
+const calBack=document.getElementById('calBack');
+document.getElementById('dateOpen').onclick=()=>{calView=new Date(curDate);renderCal();calBack.classList.add('show')};
+document.getElementById('calClose').onclick=()=>calBack.classList.remove('show');
+calBack.onclick=e=>{if(e.target===calBack)calBack.classList.remove('show')};
+document.getElementById('calPrev').onclick=()=>{calView.setMonth(calView.getMonth()-1);renderCal()};
+document.getElementById('calNext').onclick=()=>{calView.setMonth(calView.getMonth()+1);renderCal()};
+document.getElementById('calToday').onclick=()=>{curDate=new Date();calBack.classList.remove('show');renderAll()};
+function daysWithData(){const s=new Set();entries.forEach(e=>{if((e.amount>0)||(e.miles>0)) s.add(e.date)});return s}
+function renderCal(){
+  document.getElementById('calMonth').textContent=calView.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const grid=document.getElementById('calGrid');grid.innerHTML='';
+  ['M','T','W','T','F','S','S'].forEach(d=>{const el=document.createElement('div');el.className='dow';el.textContent=d;grid.appendChild(el)});
+  const first=new Date(calView.getFullYear(),calView.getMonth(),1);
+  const startPad=(first.getDay()+6)%7;
+  const daysIn=new Date(calView.getFullYear(),calView.getMonth()+1,0).getDate();
+  const has=daysWithData();const todayK=dkey(new Date());const selK=dkey(curDate);
+  for(let i=0;i<startPad;i++){const el=document.createElement('div');el.className='cell other';grid.appendChild(el)}
+  for(let d=1;d<=daysIn;d++){
+    const dt=new Date(calView.getFullYear(),calView.getMonth(),d);const k=dkey(dt);
+    const el=document.createElement('div');el.className='cell'+(k===todayK?' today':'')+(k===selK?' sel':'')+(has.has(k)?' has':'');
+    el.textContent=d;
+    el.onclick=()=>{curDate=dt;calBack.classList.remove('show');renderAll()};
+    grid.appendChild(el);
+  }
+}
+
+/* ============ TABS ============ */
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.getElementById('v-'+b.dataset.tab).classList.add('on');
+  document.getElementById('foot').style.display=b.dataset.tab==='log'?'flex':'none';
+  if(b.dataset.tab==='summary')renderSummary();
+});
+
+/* ============ CADETS ============ */
+document.getElementById('tglBlanks').onclick=()=>{showAll=!showAll;document.getElementById('tglBlanks').textContent=showAll?'Hide blanks':'Show all';renderCadets()};
+document.getElementById('addC').onclick=()=>{const b=document.getElementById('addBar');b.style.display=b.style.display==='none'?'flex':'none';if(b.style.display==='flex')document.getElementById('newC').focus()};
+document.getElementById('saveC').onclick=addCadet;
+document.getElementById('newC').addEventListener('keydown',e=>{if(e.key==='Enter')addCadet()});
+async function addCadet(){
+  const inp=document.getElementById('newC');const name=inp.value.trim();if(!name)return;
+  const tmp={id:uuid(),name};clients.push(tmp);cacheSave();inp.value='';renderCadets();
+  setCloud('syncing');
+  try{const r=await api('clients','POST',{name});if(r.ok){tmp.id=r.client.id;cacheSave();renderCadets()}setCloud('ok')}catch(e){setCloud('off')}
+}
+function renderCadets(){
+  const wrap=document.getElementById('cadets');const date=activeDate();
+  if(clients.length===0){wrap.innerHTML='<div class="empty">No cadets yet.<br>Add your regulars above.</div>';return}
+  const vis=clients.filter(c=>{const e=incomeFor(c.id,date);return showAll||(e&&e.amount>0)});
+  if(vis.length===0){wrap.innerHTML='<div class="empty">No pay logged '+(mode==='week'?'this week':'today')+' yet.<br>Tap “Show all” to enter a payment.</div>';return}
+  wrap.innerHTML='';
+  vis.forEach(c=>{
+    const e=incomeFor(c.id,date);const val=e&&e.amount>0?e.amount:'';const paid=!!val;
+    const row=document.createElement('div');row.className='cadet'+(paid?' paid':'');
+    row.innerHTML=`<div class="badge">${paid?'🎖️':'🐾'}</div><div class="nm">${esc(c.name)}</div>
+      <div class="amt${paid?' filled':''}"><span>$</span><input inputmode="decimal" data-cid="${c.id}" value="${val}" placeholder="0"></div>
+      <div class="x" data-del="${c.id}">×</div>`;
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll('input[data-cid]').forEach(inp=>{
+    inp.addEventListener('input',ev=>{
+      const cid=ev.target.dataset.cid;const v=ev.target.value.trim();const date=activeDate();
+      let e=incomeFor(cid,date);
+      const amt=parseFloat(v);
+      if(v&&amt>0){
+        if(!e){e={id:uuid(),kind:'income',date,client_id:cid,amount:amt,label:null,miles:null};}
+        else e.amount=amt;
+        putEntry(e);
+      }else if(e){delEntry(e.id);}
+      const rowEl=ev.target.closest('.cadet'),aw=ev.target.closest('.amt');const paid=v&&amt>0;
+      rowEl.classList.toggle('paid',!!paid);aw.classList.toggle('filled',!!paid);rowEl.querySelector('.badge').textContent=paid?'🎖️':'🐾';
+      updateFoot();
+    });
+  });
+  wrap.querySelectorAll('[data-del]').forEach(x=>x.onclick=async()=>{
+    const id=x.dataset.del;if(!confirm('Remove this cadet? Past logged pay stays in your records.'))return;
+    clients=clients.filter(c=>c.id!==id);cacheSave();renderCadets();
+    try{await api('clients','DELETE',{id})}catch(e){}
+  });
+}
+
+/* ============ EXPENSES ============ */
+const eForm=document.getElementById('eForm');
+document.getElementById('addE').onclick=()=>{eForm.classList.toggle('show');if(eForm.classList.contains('show'))document.getElementById('eDesc').focus()};
+document.getElementById('eNo').onclick=()=>{eForm.classList.remove('show');eVal('','')};
+function eVal(a,b){document.getElementById('eDesc').value=a;document.getElementById('eAmt').value=b}
+document.getElementById('eGo').onclick=()=>{
+  const desc=document.getElementById('eDesc').value.trim();const amt=parseFloat(document.getElementById('eAmt').value);
+  if(!amt||amt<=0)return;
+  putEntry({id:uuid(),kind:'expense',date:activeDate(),label:desc||'Expense',amount:amt,client_id:null,miles:null});
+  eVal('','');eForm.classList.remove('show');renderExp();updateFoot();
+};
+function renderExp(){
+  const wrap=document.getElementById('eList');const list=dayEntries(activeDate(),'expense');
+  wrap.innerHTML='';list.forEach(x=>{const el=document.createElement('div');el.className='li';
+    el.innerHTML=`<span class="ic">🧾</span><div class="tx">${esc(x.label)}</div><div class="vl">-${money2(x.amount)}</div><div class="x" data-x="${x.id}">×</div>`;wrap.appendChild(el)});
+  wrap.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>{delEntry(b.dataset.x);renderExp();updateFoot()});
+}
+
+/* ============ MILEAGE ============ */
+const mForm=document.getElementById('mForm');
+document.getElementById('addM').onclick=()=>{mForm.classList.toggle('show');if(mForm.classList.contains('show'))document.getElementById('mAmt').focus()};
+document.getElementById('mNo').onclick=()=>{mForm.classList.remove('show');document.getElementById('mDesc').value='';document.getElementById('mAmt').value=''};
+document.getElementById('mGo').onclick=()=>{
+  const desc=document.getElementById('mDesc').value.trim();const mi=parseFloat(document.getElementById('mAmt').value);
+  if(!mi||mi<=0)return;
+  putEntry({id:uuid(),kind:'mileage',date:activeDate(),label:desc||'Drive',miles:mi,amount:null,client_id:null});
+  document.getElementById('mDesc').value='';document.getElementById('mAmt').value='';mForm.classList.remove('show');renderMile();
+};
+function renderMile(){
+  const wrap=document.getElementById('mList');const list=dayEntries(activeDate(),'mileage');
+  wrap.innerHTML='';list.forEach(x=>{const ded=x.miles*settings.mileRate;const el=document.createElement('div');el.className='li';
+    el.innerHTML=`<span class="ic">🚗</span><div class="tx">${esc(x.label)}<small>${x.miles} mi · ${money2(ded)} deduction</small></div><div class="x" data-m="${x.id}">×</div>`;wrap.appendChild(el)});
+  wrap.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{delEntry(b.dataset.m);renderMile()});
+}
+
+/* ============ FOOT ============ */
+function dayIncomeTotal(date){return entries.filter(e=>e.kind==='income'&&e.date===date).reduce((s,e)=>s+(e.amount||0),0)}
+function updateFoot(){
+  const inc=dayIncomeTotal(activeDate());const tax=inc*(settings.taxRate/100);
+  document.getElementById('fIn').textContent=money(inc);
+  document.getElementById('fTax').textContent=money(tax);
+  document.getElementById('fKeep').textContent=money(inc-tax);
+}
+
+/* ============ SUMMARY ============ */
+document.querySelectorAll('.per button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.per button').forEach(x=>x.classList.remove('on'));b.classList.add('on');curPeriod=b.dataset.p;renderSummary()});
+function inPeriod(dateStr){const [y,m]=dateStr.split('-').map(Number);const now=new Date();
+  if(curPeriod==='year')return y===now.getFullYear();
+  if(curPeriod==='month')return y===now.getFullYear()&&m===now.getMonth()+1;
+  return y===now.getFullYear()&&Math.floor((m-1)/3)===Math.floor(now.getMonth()/3);}
+function renderSummary(){
+  let inc=0,exp=0,miles=0;const byDate={};
+  entries.forEach(e=>{if(!inPeriod(e.date))return;
+    if(e.kind==='income'){inc+=e.amount||0;byDate[e.date]=(byDate[e.date]||0)+(e.amount||0)}
+    else if(e.kind==='expense')exp+=e.amount||0;
+    else if(e.kind==='mileage')miles+=e.miles||0;});
+  const mileDed=miles*settings.mileRate;const net=inc-exp-mileDed;const tax=net>0?net*(settings.taxRate/100):0;const keep=inc-exp-tax;
+  document.getElementById('sTax').textContent=money(tax);
+  document.getElementById('sIn').textContent=money(inc);
+  document.getElementById('sEx').textContent=money(exp);
+  document.getElementById('sMi').textContent=Math.round(miles);
+  document.getElementById('sMiD').textContent=money(mileDed)+' deduction';
+  document.getElementById('sNet').textContent=money(net);
+  document.getElementById('sKeep').textContent=money(keep);
+  const lbl=curPeriod==='month'?'this month':curPeriod==='quarter'?'this quarter':'this year';
+  document.getElementById('sTaxSub').textContent='Based on '+money(net)+' net profit '+lbl+' at '+settings.taxRate+'%.';
+  const ll=document.getElementById('logList');const keys=Object.keys(byDate).sort().reverse();
+  if(keys.length===0){ll.innerHTML='<div class="empty">No entries this period yet.</div>';return}
+  ll.innerHTML='';keys.slice(0,40).forEach(k=>{const [y,m,d]=k.split('-').map(Number);
+    const dt=new Date(y,m-1,d).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    const cnt=entries.filter(e=>e.kind==='income'&&e.date===k&&e.amount>0).length;
+    const el=document.createElement('div');el.className='logrow';
+    el.innerHTML=`<div><div class="ld">${dt}</div><div class="lc">${cnt} paid</div></div><div class="la">${money(byDate[k])}</div>`;ll.appendChild(el)});
+}
+
+/* ============ SETTINGS ============ */
+const taxR=document.getElementById('taxR'),mileR=document.getElementById('mileR');
+taxR.value=settings.taxRate;mileR.value=settings.mileRate;
+document.getElementById('taxRP').textContent=settings.taxRate+'%';
+document.getElementById('mileRP').textContent='$'+Number(settings.mileRate).toFixed(2);
+taxR.oninput=()=>{settings.taxRate=+taxR.value;document.getElementById('taxRP').textContent=taxR.value+'%';saveSettings();updateFoot()};
+mileR.oninput=()=>{settings.mileRate=+mileR.value;document.getElementById('mileRP').textContent='$'+Number(mileR.value).toFixed(2);saveSettings();renderMile()};
+document.getElementById('exp').onclick=exportCSV;
+document.getElementById('reload').onclick=()=>{toast('Refreshing…');boot()};
+document.getElementById('logout').onclick=()=>{if(confirm('Log out of this device?')){localStorage.removeItem(LS_PIN);location.reload()}};
+function exportCSV(){
+  let rows=[['Date','Type','Detail','Amount','Miles']];
+  entries.slice().sort((a,b)=>a.date<b.date?-1:1).forEach(e=>{
+    if(e.kind==='income'){const c=clients.find(x=>x.id===e.client_id);rows.push([e.date,'Income',c?c.name:'Unknown',(e.amount||0).toFixed(2),''])}
+    else if(e.kind==='expense')rows.push([e.date,'Expense',e.label||'',(-(e.amount||0)).toFixed(2),'']);
+    else rows.push([e.date,'Mileage',e.label||'',((e.miles||0)*settings.mileRate).toFixed(2),e.miles||0]);
+  });
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const b=new Blob([csv],{type:'text/csv'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='bone-cadets-income.csv';a.click();URL.revokeObjectURL(u);
+  toast('CSV exported ✓');
+}
+
+/* ============ RENDER ALL ============ */
+function renderAll(){
+  document.getElementById('tglBlanks').textContent=showAll?'Hide blanks':'Show all';
+  renderDate();renderCadets();renderExp();renderMile();updateFoot();
+}
+
+/* ============ START ============ */
+window.addEventListener('online',()=>{if(pin)boot()});
+if(pin){gate.style.display='none';boot();}
+else{document.getElementById('pin').focus?.();}
+</script>
+</body>
+</html>

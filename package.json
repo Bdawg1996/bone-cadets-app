@@ -1,0 +1,9 @@
+{
+  "name": "bonecadets-tracker",
+  "version": "1.0.0",
+  "description": "Bone Cadets income tracker — passcode-gated, Supabase-backed",
+  "private": true,
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
