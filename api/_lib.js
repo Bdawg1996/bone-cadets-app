@@ -1,29 +1,28 @@
 // Shared helpers for the serverless API functions.
-// Nothing secret lives in code — the passcode and DB keys come from
-// Vercel Environment Variables at runtime.
+// Secrets come from Vercel Environment Variables at runtime — never in code.
 
 const { createClient } = require('@supabase/supabase-js');
 
 let _client = null;
 function supa() {
   if (_client) return _client;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_KEY; // service role — server side only, never shipped to browser
-  if (!url || !key) throw new Error('Supabase env vars missing');
-  _client = createClient(url, key, { auth: { persistSession: false } });
+  const url = (process.env.SUPABASE_URL || '').trim();
+  const key = (process.env.SUPABASE_SERVICE_KEY || '').trim();
+  if (!url) throw new Error('SUPABASE_URL env var is empty or missing');
+  if (!key) throw new Error('SUPABASE_SERVICE_KEY env var is empty or missing');
+  if (!/^https:\/\/.+\.supabase\.co\/?$/.test(url)) {
+    throw new Error('SUPABASE_URL looks wrong: "' + url + '" (should be https://xxxx.supabase.co)');
+  }
+  _client = createClient(url.replace(/\/$/, ''), key, { auth: { persistSession: false } });
   return _client;
 }
 
-// Constant-time-ish passcode check. The passcode is only ever compared
-// on the server; it is never sent to the browser.
+// Passcode compare. Trims whitespace so a stray space can't break auth.
 function checkAuth(req) {
-  const expected = process.env.APP_PASSCODE;
+  const expected = (process.env.APP_PASSCODE || '').trim();
   if (!expected) return false;
-  const got = req.headers['x-passcode'] || '';
-  if (got.length !== expected.length) return false;
-  let diff = 0;
-  for (let i = 0; i < expected.length; i++) diff |= got.charCodeAt(i) ^ expected.charCodeAt(i);
-  return diff === 0;
+  const got = String(req.headers['x-passcode'] || '').trim();
+  return got.length > 0 && got === expected;
 }
 
 function json(res, status, body) {
